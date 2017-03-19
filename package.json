@@ -1,0 +1,17 @@
+{
+  "name": "manage-kpr",
+  "version": "0.0.1",
+  "description": "Keep KPR and remember people to do it",
+  "main": "src/kpr_manager.js",
+  "author": "John",
+  "contributors": [],
+  "license": "MIT",
+  "giskard": {
+    "module": "KPR Manager",
+    "created": "Sun Mar 19 2017 19:05:16 GMT-0300 (BRT)",
+    "help": {
+      "Sample command": "Describe here what the sample command does"
+    }
+  },
+  "dependencies": {}
+}
