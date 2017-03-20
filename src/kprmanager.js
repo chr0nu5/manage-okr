@@ -22,6 +22,12 @@ var KprManager = function() {
     });
 
     this.scheduleTask({
+        // minute: '*',
+        // hour: '*',
+        // monthDay: '*',
+        // month: '*',
+        // dayOfWeek: '*'
+
         minute: '0',
         hour: '10',
         monthDay: '*',
@@ -97,7 +103,7 @@ var KprManager = function() {
                                         })
                                         this.searchChannel('okr')
                                             .then(m => {
-                                                m.send('Aê! Olha aí as metas do ' + this.getMentionTagForUser(user) + ':');
+                                                m.send('Aê! Tem gente de `okr` novo, né ' + this.getMentionTagForUser(user) + ':');
                                                 m.send('```' + kprs + '```');
                                             });
                                     }
