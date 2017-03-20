@@ -112,7 +112,7 @@ var KprManager = function() {
             })
     });
 
-    this.respond(/((?:qual (?:e|é|a) minha okr\?)|(?:quais (?:as|sao|são) minhas okr\?))$/i, (response) => {
+    this.respond(/((?:qual (?:e|é|a) minha okr\?)|(?:quais (?:as|sao|são) minhas (?:okr|okrs)\?))$/i, (response) => {
         response.sendTyping();
         response.send(`Opa! Tá na mão :metal:`);
         response.getUser()
