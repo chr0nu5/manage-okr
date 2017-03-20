@@ -35,27 +35,25 @@ var KprManager = function() {
                     users.push(kpr.user_name);
                 }
             });
-            setTimeout(() => {
-                users.forEach((user) => {
-                    this.searchUser(user)
-                        .then(u => {
-                            u.send(`Bom dia ${this.getMentionTagForUser(u)}! Não esqueça de se planejar para trabalhar nas metas!`);
-                            KPR.find({
-                                user_name: user
-                            }, (err, result) => {
-                                result.sort(function(a, b) {
-                                    var a = a.id,
-                                        b = b.id;
-                                    if (a < b) return -1;
-                                    if (a > b) return 1;
-                                    return 0;
-                                }).forEach((kpr) => {
-                                    u.send(kpr.id + ' - ' + '`' + kpr.kpr + '`');
-                                });
+            users.forEach((user) => {
+                this.searchUser(user)
+                    .then(u => {
+                        u.send(`Bom dia ${this.getMentionTagForUser(u)}! Não esqueça de se planejar para trabalhar nas metas!`);
+                        KPR.find({
+                            user_name: user
+                        }, (err, result) => {
+                            result.sort(function(a, b) {
+                                var a = a.id,
+                                    b = b.id;
+                                if (a < b) return -1;
+                                if (a > b) return 1;
+                                return 0;
+                            }).forEach((kpr) => {
+                                u.send(kpr.id + ' - ' + '`' + kpr.kpr + '`');
                             });
-                        })
-                });
-            }, 4000);
+                        });
+                    })
+            });
         });
     });
 
@@ -196,7 +194,7 @@ var KprManager = function() {
                             user_id: u.id
                         }, (err, result) => {
                             response.send(`Massa! Quando mais você me informar do seu progresso, mais feliz eu fico! :grin::grin::grin:`);
-                            response.send('```' +MOTIVATIONAL[Math.floor(Math.random()*MOTIVATIONAL.length)]+ '```');
+                            response.send('```' + MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)] + '```');
                             response.send(`Bora continuar arrasando! :metal:`);
                         });
                     } else {
@@ -208,12 +206,3 @@ var KprManager = function() {
 };
 
 module.exports = Base.setup(KprManager);
-
-// var WORKED_KPR = this.registerModel('WORKED_KPR', {
-//         kpr_id: Number,
-//         user_id: String,
-//         when: {
-//             type: Date,
-//             default: Date.now
-//         }
-//     });
