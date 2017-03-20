@@ -95,6 +95,11 @@ var KprManager = function() {
                                                 });
                                             response.send((index + 1) + ' - ' + '`' + kpr + '`');
                                         })
+                                        this.searchChannel('okr')
+                                            .then(m => {
+                                                m.send('Aê! Olha aí as metas do ' + this.getMentionTagForUser(user) + ':');
+                                                m.send('```' + kprs + '```');
+                                            });
                                     }
                                 })
                             } else {
@@ -192,10 +197,14 @@ var KprManager = function() {
                         WORKED_KPR.create({
                             kpr_id: kpr,
                             user_id: u.id
-                        }, (err, result) => {
+                        }, (err, result_worked) => {
                             response.send(`Massa! Quando mais você me informar do seu progresso, mais feliz eu fico! :grin::grin::grin:`);
                             response.send('```' + MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)] + '```');
                             response.send(`Bora continuar arrasando! :metal:`);
+                            this.searchChannel('okr')
+                                .then(m => {
+                                    m.send('Aê! ' + this.getMentionTagForUser(u) + ' arrasou evoluiu a meta `' + result.kpr + '` essa semana :metal:');
+                                });
                         });
                     } else {
                         response.send(`Não conheco essa OKR! :zipper_mouth_face:`);
