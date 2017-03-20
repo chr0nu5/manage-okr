@@ -1,17 +1,20 @@
 {
-  "name": "kpr-manager",
-  "version": "0.0.1",
-  "description": "Manager KPR",
-  "main": "src/kprmanager.js",
-  "author": "Jonathan Querubina <jotadev@me.com>",
-  "contributors": [],
-  "license": "MIT",
-  "giskard": {
-    "module": "KprManager",
-    "created": "Sun Mar 19 2017 20:24:41 GMT-0300 (BRT)",
-    "help": {
-      "Sample command": "Describe here what the sample command does"
-    }
-  },
-  "dependencies": {}
+    "name": "kpr-manager",
+    "version": "0.0.1",
+    "description": "Manager KPR",
+    "main": "src/kprmanager.js",
+    "author": "Jonathan Querubina <jotadev@me.com>",
+    "contributors": [],
+    "license": "MIT",
+    "giskard": {
+        "module": "KprManager",
+        "created": "Sun Mar 19 2017 20:24:41 GMT-0300 (BRT)",
+        "help": {
+            "criar as minhas okrs / criar a minha okr": "Inicia o assistente de criação de OKRs.",
+            "qual é minha okr? / quais as minhas okrs?": "Lista suas OKRs.",
+            "atualiza minha okr / atualizar minhas okrs": "Inicia o assistente de atualização de OKRs.",
+            "essa semana trabalhei na okr {id} / esta semana trabalhei na meta {id}": "Informa ao R2 qual OKR (por ID) você trabalhou nesta semana.",
+        }
+    },
+    "dependencies": {}
 }
