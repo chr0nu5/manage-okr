@@ -13,7 +13,7 @@
             "criar as minhas okrs / criar a minha okr": "Inicia o assistente de criação de OKRs.",
             "qual é minha okr? / quais as minhas okrs?": "Lista suas OKRs.",
             "atualiza minha okr / atualizar minhas okrs": "Inicia o assistente de atualização de OKRs.",
-            "essa semana trabalhei na okr {id} / esta semana trabalhei na meta {id}": "Informa ao R2 qual OKR (por ID) você trabalhou nesta semana.",
+            "essa semana trabalhei na okr {id} / esta semana trabalhei na meta {id}": "Informa ao R2 qual OKR (por ID) você trabalhou nesta semana."
         }
     },
     "dependencies": {}
