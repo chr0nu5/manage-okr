@@ -57,10 +57,10 @@ var KprManager = function() {
         });
     });
 
-    this.respond(/criar (?:a|as) (?:minha|minhas) (?:kpr|kprs)$/i, (response) => {
+    this.respond(/criar (?:a|as) (?:minha|minhas) (?:okr|okrs)$/i, (response) => {
         response.sendTyping();
-        response.send('Para registrar (ou atualizar) seus `KPR`, envie neste modelo (um por linha): ```Me libertar do Slack\nDominar o mundo\nAcabar com os humanos```')
-        response.ask(`E aí, quais suas kpr's?`, this.Context.REGEX, /([\s\S]*)/m)
+        response.send('Para registrar (ou atualizar) seus `OKR`, envie neste modelo (um por linha): ```Me libertar do Slack\nDominar o mundo\nAcabar com os humanos```')
+        response.ask(`E aí, quais suas okr's?`, this.Context.REGEX, /([\s\S]*)/m)
             .then((response) => {
                 var user = null;
                 response.getUser()
@@ -102,12 +102,12 @@ var KprManager = function() {
                             }
                         })
                 } else {
-                    response.send(`Não entendi seus KPR's. Pode tentar de novo? :confused:`);
+                    response.send(`Não entendi seus OKR's. Pode tentar de novo? :confused:`);
                 }
             })
     });
 
-    this.respond(/((?:qual (?:e|é|a) minha kpr\?)|(?:quais (?:as|sao|são) minhas kprs\?))$/i, (response) => {
+    this.respond(/((?:qual (?:e|é|a) minha okr\?)|(?:quais (?:as|sao|são) minhas okr\?))$/i, (response) => {
         response.sendTyping();
         response.send(`Opa! Tá na mão :metal:`);
         response.getUser()
@@ -128,7 +128,7 @@ var KprManager = function() {
             });
     })
 
-    this.respond(/(?:atualiza|atualizar) (?:meu|meus|minha|minhas) (?:kpr|kprs)$/i, (response) => {
+    this.respond(/(?:atualiza|atualizar) (?:meu|meus|minha|minhas) (?:okr|okrs)$/i, (response) => {
         response.sendTyping();
         response.getUser()
             .then((u) => {
@@ -179,7 +179,7 @@ var KprManager = function() {
             });
     });
 
-    this.respond(/(?:essa|esta) semana trabalhei na (?:kpr|meta) (.+)$/i, (response) => {
+    this.respond(/(?:essa|esta) semana trabalhei na (?:okr|meta) (.+)$/i, (response) => {
         var kpr = response.match[1];
         response.sendTyping();
         response.getUser()
@@ -198,7 +198,7 @@ var KprManager = function() {
                             response.send(`Bora continuar arrasando! :metal:`);
                         });
                     } else {
-                        response.send(`Não conheco essa KPR! :zipper_mouth_face:`);
+                        response.send(`Não conheco essa OKR! :zipper_mouth_face:`);
                     }
                 });
             });
