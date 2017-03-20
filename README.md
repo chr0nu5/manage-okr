@@ -1,4 +1,4 @@
-# manage-kpr
-> Keep KPR and remember people to do it
+# kpr-manager
+> Manager KPR
 
 [Describe here how to install your module, and how to use it]
