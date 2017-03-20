@@ -88,9 +88,9 @@ var KprManager = function() {
                                         response.send(`Agora é comigo, vamos bater todas essas metas! :sunglasses:`);
                                         kprs.split('\n').forEach((kpr, index) => {
                                             KPR.update({
-                                                    id: index + 1
+                                                    id: index + 1,
+                                                    user_id: user.id
                                                 }, {
-                                                    user_id: user.id,
                                                     user_name: user.username,
                                                     kpr: kpr
                                                 }, {
@@ -209,7 +209,7 @@ var KprManager = function() {
                             response.send(`Bora continuar arrasando! :metal:`);
                             this.searchChannel('okr')
                                 .then(m => {
-                                    m.send('Aê! ' + this.getMentionTagForUser(u) + ' arrasou evoluiu a meta `' + result.kpr + '` essa semana :metal:');
+                                    m.send('Aê! ' + this.getMentionTagForUser(u) + ' arrasou e evoluiu no okr `' + result.kpr + '` essa semana :metal:');
                                 });
                         });
                     } else {
