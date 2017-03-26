@@ -9,11 +9,12 @@ var KprManager = function() {
         id: Number,
         user_id: String,
         user_name: String,
-        kpr: String
+        kpr: String,
+        skpr: String
     });
 
     var WORKED_KPR = this.registerModel('WORKED_KPR', {
-        kpr_id: Number,
+        kpr: String,
         user_id: String,
         when: {
             type: Date,
@@ -44,7 +45,79 @@ var KprManager = function() {
             users.forEach((user) => {
                 this.searchUser(user)
                     .then(u => {
-                        u.send(`Bom dia ${this.getMentionTagForUser(u)}! Não esqueça de se planejar para trabalhar nas metas!`);
+                        u.send(`Bom dia ${this.getMentionTagForUser(u)}! Vamos nos planejar para atacar essas OKR'S nessa semana?!`);
+                        KPR.find({
+                            user_name: user
+                        }, (err, result) => {
+                            var i = 1;
+                            var kpr_list = [];
+                            result.sort(function(a, b) {
+                                var a = a.id,
+                                    b = b.id;
+                                if (a < b) return -1;
+                                if (a > b) return 1;
+                                return 0;
+                            }).forEach((kpr) => {
+                                kpr_list.push(kpr.kpr);
+                                u.send(i++ + ' - ' + '`' + kpr.kpr + '` ```' + kpr.skpr + '```');
+                            });
+                            setTimeout(() => {
+                                u.ask(`Diz pra mim, qual vai ser o foco da semana?  (me fala o ID dele :sunglasses:)`, this.Context.NUMBER)
+                                    .then((response) => {
+                                        var id_kpr = response.match;
+                                        if (kpr_list[id_kpr - 1]) {
+                                            var kpr_to_work = kpr_list[id_kpr - 1];
+                                            console.log(kpr_to_work)
+                                            WORKED_KPR.create({
+                                                kpr: kpr_to_work,
+                                                user_id: u.id
+                                            }, (err, result_worked) => {
+                                                response.send(`Massa! Quando mais você me informar do seu progresso, mais feliz eu fico! :grin::grin::grin:`);
+                                                response.send('```' + MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)] + '```');
+                                                response.send(`Bora continuar arrasando! :metal:`);
+                                                this.searchChannel('okr')
+                                                    .then(m => {
+                                                        m.send('### OKR ' + this.getMentionTagForUser(u));
+                                                        m.send('```' + kpr_list.join('\n') + '```')
+                                                        m.send('Nessa semana o foco será: `' + kpr_to_work + '`');
+                                                    });
+                                            });
+
+                                        } else {
+                                            response.send(`Esse ID está errado! :zipper_mouth_face:`);
+                                        }
+                                    })
+                            })
+                        });
+                    })
+            });
+        });
+    });
+
+    this.scheduleTask({
+        // minute: '*',
+        // hour: '*',
+        // monthDay: '*',
+        // month: '*',
+        // dayOfWeek: '*'
+
+        minute: '0',
+        hour: '17',
+        monthDay: '*',
+        month: '*',
+        dayOfWeek: '6'
+    }, () => {
+        var users = [];
+        KPR.find({}, (err, result) => {
+            result.forEach((kpr) => {
+                if (users.indexOf(kpr.user_name) == -1) {
+                    users.push(kpr.user_name);
+                }
+            });
+            users.forEach((user) => {
+                this.searchUser(user)
+                    .then(u => {
+                        u.send(`E ai ${this.getMentionTagForUser(u)}, como foi a semana? Em quais metas você trabalhou?`);
                         KPR.find({
                             user_name: user
                         }, (err, result) => {
@@ -63,10 +136,10 @@ var KprManager = function() {
         });
     });
 
-    this.respond(/criar (?:a|as) (?:minha|minhas) (?:okr|okrs)$/i, (response) => {
+    this.respond(/criar (?:meus okrs|okrs)$/i, (response) => {
         response.sendTyping();
-        response.send('Para registrar (ou atualizar) seus `OKR`, envie neste modelo (um por linha): ```Me libertar do Slack\nDominar o mundo\nAcabar com os humanos```')
-        response.ask(`E aí, quais suas okr's?`, this.Context.REGEX, /([\s\S]*)/m)
+        response.send('Para registrar seus OKR\'s, envie neste modelo: ```Me libertar do Slack```')
+        response.ask(`E aí, qual seu okr?`, this.Context.REGEX, /([\s\S]*)/m)
             .then((response) => {
                 var user = null;
                 response.getUser()
@@ -74,51 +147,49 @@ var KprManager = function() {
                         user = u;
                     });
                 var kprs = (response.match[1] || '').replace(/`/g, '').trim();
-                if (kprs.length) {
-                    response.sendTyping();
-                    response.send(`Boa!`);
-                    response.send('```' + kprs + '```');
-                    response.ask(`Era isto mesmo?`, this.Context.BOOLEAN)
-                        .then((response) => {
+                response.ask('E quais os key results desse okr? Mande neste modelo ```Conseguir a senha do admin\nTrocar a senha do admin\nAlterar meu código```', this.Context.REGEX, /([\s\S]*)/m)
+                    .then((response) => {
+                        var krs = (response.match[1] || '').replace(/`/g, '').trim();
+                        if (kprs.length && krs.length) {
                             response.sendTyping();
-                            if (response.match) {
-                                KPR.deleteMany({ user_id: user.id }, (err) => {
-                                    if (!err) {
+                            response.send(`Boa!`);
+                            response.send('Okr: \n `' + kprs + '` \n Key results: ```' + krs + '```');
+                            response.ask(`É isso mesmo??`, this.Context.BOOLEAN)
+                                .then((response) => {
+                                    response.sendTyping();
+                                    if (response.match) {
                                         response.sendTyping();
-                                        response.send(`Agora é comigo, vamos bater todas essas metas! :sunglasses:`);
+                                        response.send(`Agora é com a gente, vamos bater todas essas metas! :sunglasses:`);
                                         kprs.split('\n').forEach((kpr, index) => {
-                                            KPR.update({
+                                            KPR.create({
                                                     id: index + 1,
-                                                    user_id: user.id
-                                                }, {
+                                                    user_id: user.id,
                                                     user_name: user.username,
-                                                    kpr: kpr
-                                                }, {
-                                                    upsert: true
+                                                    kpr: kpr,
+                                                    skpr: krs,
                                                 })
                                                 .then((result) => {
                                                     // console.log(result);
                                                 });
-                                            response.send((index + 1) + ' - ' + '`' + kpr + '`');
+                                            response.send('`' + kpr + '` ```' + krs + '```');
                                         })
                                         this.searchChannel('okr')
                                             .then(m => {
                                                 m.send('Aê! Tem gente de `okr` novo, né ' + this.getMentionTagForUser(user) + ':');
                                                 m.send('```' + kprs + '```');
                                             });
+                                    } else {
+                                        response.send(`No problemo! Me manda quanto tiver certeza! :metal:`);
                                     }
                                 })
-                            } else {
-                                response.send(`No problemo! Me manda quanto tiver certeza! :metal:`);
-                            }
-                        })
-                } else {
-                    response.send(`Não entendi seus OKR's. Pode tentar de novo? :confused:`);
-                }
+                        } else {
+                            response.send(`Não entendi seus OKR's. Pode tentar de novo? :confused:`);
+                        }
+                    })
             })
     });
 
-    this.respond(/((?:qual (?:e|é|a) minha okr\?)|(?:quais (?:as|sao|são) minhas (?:okr|okrs)\?))$/i, (response) => {
+    this.respond(/((?:qual (?:e|é|a) meu okr\?)|(?:quais (?:os|sao|são) meus (?:okr|okrs)\?))$/i, (response) => {
         response.sendTyping();
         response.send(`Opa! Tá na mão :metal:`);
         response.getUser()
@@ -126,14 +197,9 @@ var KprManager = function() {
                 KPR.find({
                     user_id: u.id
                 }, (err, result) => {
-                    result.sort(function(a, b) {
-                        var a = a.id,
-                            b = b.id;
-                        if (a < b) return -1;
-                        if (a > b) return 1;
-                        return 0;
-                    }).forEach((kpr) => {
-                        response.send(kpr.id + ' - ' + '`' + kpr.kpr + '`');
+                    var i = 1;
+                    result.forEach((kpr) => {
+                        response.send('`' + kpr.kpr + '` ```' + kpr.skpr + '```');
                     });
                 });
             });
@@ -146,6 +212,8 @@ var KprManager = function() {
                 KPR.find({
                     user_id: u.id
                 }, (err, result) => {
+                    var i = 1;
+                    var kpr_list = [];
                     result.sort(function(a, b) {
                         var a = a.id,
                             b = b.id;
@@ -153,71 +221,116 @@ var KprManager = function() {
                         if (a > b) return 1;
                         return 0;
                     }).forEach((kpr) => {
-                        response.send(kpr.id + ' - ' + '`' + kpr.kpr + '`');
+                        kpr_list.push(kpr.kpr);
+                        response.send(i++ + ' - ' + '`' + kpr.kpr + '`');
                     });
                     response.sendTyping();
                     response.ask(`Qual? (me fala o ID dele :sunglasses:)`, this.Context.NUMBER)
                         .then((response) => {
                             var id_kpr = response.match;
-                            KPR.findOne({
-                                id: id_kpr,
-                                user_id: u.id
-                            }, (err, result) => {
-                                if (result) {
-                                    response.sendTyping();
-                                    response.ask(`E qual vai ser o novo texto?`, this.Context.REGEX, /([\s\S]*)/m)
-                                        .then((response) => {
-                                            var kpr = (response.match[1] || '').replace(/`/g, '').trim();
-                                            response.sendTyping();
-                                            KPR.update({
-                                                    id: id_kpr,
-                                                    user_id: u.id
-                                                }, {
-                                                    kpr: kpr
-                                                }, {
-                                                    upsert: true
-                                                })
-                                                .then((result) => {
-                                                    response.send(`Maravilha! :facepunch: Não esquece dele!`);
-                                                });
-                                        })
-                                } else {
-                                    response.send(`Esse ID está errado! :zipper_mouth_face:`);
-                                }
-                            });
+                            if (kpr_list[id_kpr - 1]) {
+                                var kpr_to_update = kpr_list[id_kpr - 1];
+                                response.sendTyping();
+                                response.ask('E qual vai ser o novo kpr? Envie neste modelo: ```Me libertar do Slack```', this.Context.REGEX, /([\s\S]*)/m)
+                                    .then((response) => {
+                                        var krs = (response.match[1] || '').replace(/`/g, '').trim();
+                                        response.sendTyping();
+                                        response.ask('E quais os key results desse okr? Mande neste modelo ```Conseguir a senha do admin\nTrocar a senha do admin\nAlterar meu código```', this.Context.REGEX, /([\s\S]*)/m)
+                                            .then((response) => {
+                                                if (krs.length) {
+                                                    KPR.update({
+                                                            user_id: u.id,
+                                                            kpr: kpr_to_update
+                                                        }, {
+                                                            skpr: krs
+                                                        }, {
+                                                            upsert: true
+                                                        })
+                                                        .then((result) => {
+                                                            response.send(`Maravilha! :facepunch: Não esquece dele!`);
+                                                        });
+                                                } else {
+                                                    response.send(`Preciso saber os key results! :zipper_mouth_face:`);
+                                                }
+
+                                            });
+                                    })
+                            } else {
+                                response.send(`Esse ID está errado! :zipper_mouth_face:`);
+                            }
                         })
                 });
             });
     });
 
-    this.respond(/(?:essa|esta) semana trabalhei na (?:okr|meta) (.+)$/i, (response) => {
-        var kpr = response.match[1];
+    this.respond(/(?:deleta|deletar) (?:meu|meus|minha|minhas) (?:okr|okrs)$/i, (response) => {
         response.sendTyping();
         response.getUser()
             .then((u) => {
-                KPR.findOne({
-                    user_id: u.id,
-                    id: kpr
+                KPR.find({
+                    user_id: u.id
                 }, (err, result) => {
-                    if (result) {
-                        WORKED_KPR.create({
-                            kpr_id: kpr,
-                            user_id: u.id
-                        }, (err, result_worked) => {
-                            response.send(`Massa! Quando mais você me informar do seu progresso, mais feliz eu fico! :grin::grin::grin:`);
-                            response.send('```' + MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)] + '```');
-                            response.send(`Bora continuar arrasando! :metal:`);
-                            this.searchChannel('okr')
-                                .then(m => {
-                                    m.send('Aê! ' + this.getMentionTagForUser(u) + ' arrasou e evoluiu no okr `' + result.kpr + '` essa semana :metal:');
-                                });
-                        });
-                    } else {
-                        response.send(`Não conheco essa OKR! :zipper_mouth_face:`);
-                    }
+                    var i = 1;
+                    var kpr_list = [];
+                    result.sort(function(a, b) {
+                        var a = a.id,
+                            b = b.id;
+                        if (a < b) return -1;
+                        if (a > b) return 1;
+                        return 0;
+                    }).forEach((kpr) => {
+                        kpr_list.push(kpr.kpr);
+                        response.send(i++ + ' - ' + '`' + kpr.kpr + '`');
+                    });
+                    response.sendTyping();
+                    response.ask(`Qual? (me fala o ID dele :sunglasses:)`, this.Context.NUMBER)
+                        .then((response) => {
+                            var id_kpr = response.match;
+                            if (kpr_list[id_kpr - 1]) {
+                                var kpr_to_delete = kpr_list[id_kpr - 1];
+                                KPR.remove({
+                                        user_id: u.id,
+                                        kpr: kpr_to_delete,
+                                    })
+                                    .then((result) => {
+                                        response.send(`Removido :eyes:`);
+                                    });
+                            } else {
+                                response.send(`Esse ID está errado! :zipper_mouth_face:`);
+                            }
+                        })
                 });
             });
-    })
+    });
+
+    // this.respond(/(?:essa|esta) semana trabalhei na (?:okr|meta) (.+)$/i, (response) => {
+    //     var kpr = response.match[1];
+    //     response.sendTyping();
+    //     response.getUser()
+    //         .then((u) => {
+    //             KPR.findOne({
+    //                 user_id: u.id,
+    //                 kpr: kpr
+    //             }, (err, result) => {
+    //                 if (result) {
+    //                     WORKED_KPR.create({
+    //                         kpr: kpr,
+    //                         user_id: u.id
+    //                     }, (err, result_worked) => {
+    //                         response.send(`Massa! Quando mais você me informar do seu progresso, mais feliz eu fico! :grin::grin::grin:`);
+    //                         response.send('```' + MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)] + '```');
+    //                         response.send(`Bora continuar arrasando! :metal:`);
+    //                         this.searchChannel('okr')
+    //                             .then(m => {
+    //                                 m.send('Aê! ' + this.getMentionTagForUser(u) + ' arrasou e evoluiu no okr `' + result.kpr + '` essa semana :metal:');
+    //                             });
+    //                     });
+    //                 } else {
+    //                     response.send(`Não conheco essa OKR! :zipper_mouth_face:`);
+    //                 }
+    //             });
+    //         });
+    // })
 };
 
 module.exports = Base.setup(KprManager);
