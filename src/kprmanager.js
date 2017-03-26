@@ -94,47 +94,47 @@ var KprManager = function() {
         });
     });
 
-    this.scheduleTask({
-        // minute: '*',
-        // hour: '*',
-        // monthDay: '*',
-        // month: '*',
-        // dayOfWeek: '*'
+    // this.scheduleTask({
+    //     // minute: '*',
+    //     // hour: '*',
+    //     // monthDay: '*',
+    //     // month: '*',
+    //     // dayOfWeek: '*'
 
-        minute: '0',
-        hour: '17',
-        monthDay: '*',
-        month: '*',
-        dayOfWeek: '6'
-    }, () => {
-        var users = [];
-        KPR.find({}, (err, result) => {
-            result.forEach((kpr) => {
-                if (users.indexOf(kpr.user_name) == -1) {
-                    users.push(kpr.user_name);
-                }
-            });
-            users.forEach((user) => {
-                this.searchUser(user)
-                    .then(u => {
-                        u.send(`E ai ${this.getMentionTagForUser(u)}, como foi a semana? Em quais metas você trabalhou?`);
-                        KPR.find({
-                            user_name: user
-                        }, (err, result) => {
-                            result.sort(function(a, b) {
-                                var a = a.id,
-                                    b = b.id;
-                                if (a < b) return -1;
-                                if (a > b) return 1;
-                                return 0;
-                            }).forEach((kpr) => {
-                                u.send(kpr.id + ' - ' + '`' + kpr.kpr + '`');
-                            });
-                        });
-                    })
-            });
-        });
-    });
+    //     minute: '0',
+    //     hour: '17',
+    //     monthDay: '*',
+    //     month: '*',
+    //     dayOfWeek: '6'
+    // }, () => {
+    //     var users = [];
+    //     KPR.find({}, (err, result) => {
+    //         result.forEach((kpr) => {
+    //             if (users.indexOf(kpr.user_name) == -1) {
+    //                 users.push(kpr.user_name);
+    //             }
+    //         });
+    //         users.forEach((user) => {
+    //             this.searchUser(user)
+    //                 .then(u => {
+    //                     u.send(`E ai ${this.getMentionTagForUser(u)}, como foi a semana? Em quais metas você trabalhou?`);
+    //                     KPR.find({
+    //                         user_name: user
+    //                     }, (err, result) => {
+    //                         result.sort(function(a, b) {
+    //                             var a = a.id,
+    //                                 b = b.id;
+    //                             if (a < b) return -1;
+    //                             if (a > b) return 1;
+    //                             return 0;
+    //                         }).forEach((kpr) => {
+    //                             u.send(kpr.id + ' - ' + '`' + kpr.kpr + '`');
+    //                         });
+    //                     });
+    //                 })
+    //         });
+    //     });
+    // });
 
     this.respond(/criar (?:meus okrs|okrs)$/i, (response) => {
         response.sendTyping();
